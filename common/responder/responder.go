@@ -1,12 +1,12 @@
 package responder
 
 import (
-	"encoding/json"
-	"net/http"
+    "encoding/json"
+    "net/http"
 
-	pkgErrors "github.com/pkg/errors"
-	"github.com/rysmaadit/go-template/common/errors"
-	"github.com/sirupsen/logrus"
+    "github.com/itp-backend/backend-a-co-create/common/errors"
+    pkgErrors "github.com/pkg/errors"
+    "github.com/sirupsen/logrus"
 )
 
 type Template struct {

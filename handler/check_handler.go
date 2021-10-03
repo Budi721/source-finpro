@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/rysmaadit/go-template/common/responder"
-	"github.com/rysmaadit/go-template/service"
+	"github.com/itp-backend/backend-a-co-create/common/responder"
+	"github.com/itp-backend/backend-a-co-create/service"
 	"net/http"
 )
 

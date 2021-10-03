@@ -3,9 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/rysmaadit/go-template/common/responder"
-	"github.com/rysmaadit/go-template/contract"
-	"github.com/rysmaadit/go-template/service"
+	"github.com/itp-backend/backend-a-co-create/common/responder"
+	"github.com/itp-backend/backend-a-co-create/contract"
+	"github.com/itp-backend/backend-a-co-create/service"
 	log "github.com/sirupsen/logrus"
 )
 

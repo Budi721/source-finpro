@@ -1,16 +1,23 @@
 package service
 
 import (
-	"github.com/rysmaadit/go-template/app"
-	"github.com/rysmaadit/go-template/external/jwt_client"
-	"github.com/rysmaadit/go-template/external/minio"
-	"github.com/rysmaadit/go-template/external/mysql"
-	"github.com/rysmaadit/go-template/external/redis"
+	"github.com/itp-backend/backend-a-co-create/app"
+	"github.com/itp-backend/backend-a-co-create/external/jwt_client"
+	"github.com/itp-backend/backend-a-co-create/external/minio"
+	"github.com/itp-backend/backend-a-co-create/external/mysql"
+	"github.com/itp-backend/backend-a-co-create/external/redis"
+	"github.com/itp-backend/backend-a-co-create/repository"
+	"gorm.io/gorm"
 )
 
 type Dependencies struct {
-	AuthService  AuthServiceInterface
-	CheckService CheckService
+	DBConn            *gorm.DB
+	AuthService       AuthServiceInterface
+	CheckService      CheckService
+	UserService       IUserService
+	EnrollmentService IEnrollmentService
+	ProjectService    IProjectService
+	ArticleService    IArticleService
 }
 
 func InstantiateDependencies(application *app.Application) Dependencies {
@@ -33,8 +40,26 @@ func InstantiateDependencies(application *app.Application) Dependencies {
 	})
 	checkService := NewCheckService(redisClient, mysqlClient, minioClient)
 
+	dbConn := mysql.NewDBConnection(mysqlClient)
+
+	userRepo := repository.NewUserRepository(dbConn)
+	userService := NewUserService(userRepo, application.Config, jwtWrapper)
+
+	enrollmentRepo := repository.NewEnrollmentRepository(dbConn)
+	enrollmentService := NewEnrollmentService(enrollmentRepo)
+
+	projectRepo := repository.NewProjectRepository(dbConn)
+	projectService := NewProjectService(projectRepo)
+
+	articleRepo := repository.NewArticleRepository(dbConn)
+	articleService := NewArticleService(articleRepo)
+
 	return Dependencies{
-		AuthService:  authService,
-		CheckService: checkService,
+		AuthService:       authService,
+		CheckService:      checkService,
+		UserService:       userService,
+		EnrollmentService: enrollmentService,
+		ProjectService:    projectService,
+		ArticleService:    articleService,
 	}
 }

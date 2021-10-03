@@ -2,7 +2,8 @@ package mysql
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
+    "github.com/itp-backend/backend-a-co-create/model"
+    log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -25,7 +26,7 @@ func (c *client) Ping() error {
 }
 
 func NewMysqlClient(config ClientConfig) *client {
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
+	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=UTC",
 		config.Username,
 		config.Password,
 		config.Host,
@@ -37,10 +38,16 @@ func NewMysqlClient(config ClientConfig) *client {
 		PrepareStmt:                              true,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
+
+    dbConn.AutoMigrate(&model.User{}, &model.Article{}, &model.Enrollment{}, &model.Project{})
 	if err != nil {
 		log.Fatalf("unable to initiate mysql connection. %v", err)
 	}
 	return &client{
 		dbConnection: dbConn,
 	}
+}
+
+func NewDBConnection(c *client) *gorm.DB {
+    return c.dbConnection
 }

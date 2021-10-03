@@ -6,10 +6,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-	"github.com/rysmaadit/go-template/common/errors"
-	"github.com/rysmaadit/go-template/config"
-	"github.com/rysmaadit/go-template/contract"
-	"github.com/rysmaadit/go-template/external/jwt_client"
+	"github.com/itp-backend/backend-a-co-create/common/errors"
+	"github.com/itp-backend/backend-a-co-create/config"
+	"github.com/itp-backend/backend-a-co-create/contract"
+	"github.com/itp-backend/backend-a-co-create/external/jwt_client"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -2,9 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/rysmaadit/go-template/external/minio"
-	"github.com/rysmaadit/go-template/external/mysql"
-	"github.com/rysmaadit/go-template/external/redis"
+	"github.com/itp-backend/backend-a-co-create/external/minio"
+	"github.com/itp-backend/backend-a-co-create/external/mysql"
+	"github.com/itp-backend/backend-a-co-create/external/redis"
 	log "github.com/sirupsen/logrus"
 )
 

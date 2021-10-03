@@ -9,9 +9,9 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/rysmaadit/go-template/app"
-	"github.com/rysmaadit/go-template/router"
-	"github.com/rysmaadit/go-template/service"
+	"github.com/itp-backend/backend-a-co-create/app"
+	"github.com/itp-backend/backend-a-co-create/router"
+	"github.com/itp-backend/backend-a-co-create/service"
 	log "github.com/sirupsen/logrus"
 )
 
