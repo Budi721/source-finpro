@@ -5,15 +5,17 @@ import (
 )
 
 type Project struct {
-	IdProject          int    `json:"id_project" gorm:"primaryKey"`
-	KategoriProject    string `json:"kategori_project"`
-	NamaProject        string `json:"nama_project"`
-	TanggalMulai       int64  `json:"tanggal_mulai"`
-	LinkTrello         string `json:"link_trello"`
-	DeskripsiProject   string `json:"deskripsi_project"`
-	InvitedUserId      []User `json:"invited_user_id" gorm:"many2many:user_invited;"`
-	CollaboratorUserId []User `json:"collaborator_user_id" gorm:"many2many:user_collaborator;"`
-	Admin              int    `json:"admin"`
+	IdProject          int    `json:"id_project,omitempty" gorm:"primaryKey"`
+	KategoriProject    string `json:"kategori_project,omitempty"`
+	NamaProject        string `json:"nama_project,omitempty"`
+	TanggalMulai       int64  `json:"tanggal_mulai,omitempty"`
+	LinkTrello         string `json:"link_trello,omitempty"`
+	DeskripsiProject   string `json:"deskripsi_project,omitempty"`
+	InvitedUserId      []int  `json:"invited_user_id,omitempty" gorm:"-"`
+	CollaboratorUserId []int  `json:"collaborator_user_id,omitempty" gorm:"-"`
+	Admin              int    `json:"admin,omitempty"`
+	UsersInvited       []User `json:"-" gorm:"many2many:user_invited;"`
+	UsersCollaborator  []User `json:"-" gorm:"many2many:user_collaborator;"`
 }
 
 func (p Project) GetInvitedUserId(dataJson string) []int {

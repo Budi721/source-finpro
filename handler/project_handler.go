@@ -24,16 +24,7 @@ func CreateProjectHandler(service service.IProjectService) http.HandlerFunc {
             responder.NewHttpResponse(r, w, http.StatusInternalServerError, nil, err)
             return
         }
-        /**
-        {
-        "kategori_project":"Go Green",
-        "nama_project":"Reboisasi",
-        "tanggal_mulai":"09/09/2021",
-        "link_trello":"https://trello.com/c/EuJ1zjbJ/94-devlist-backend",
-        "deskripsi_project":"Deskripsi",
-        "invited_user_id":[1,2]
-        }
-         */
+
         retrievedProject, err := service.CreateProject(r.Context(), &project)
         if err != nil {
             log.Error(err)

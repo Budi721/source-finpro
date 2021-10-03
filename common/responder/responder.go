@@ -10,7 +10,7 @@ import (
 )
 
 type Template struct {
-	Status bool        `json:"status"`
+	Status int        `json:"status"`
 	Error  interface{} `json:"error"`
 	Result interface{} `json:"result"`
 }
@@ -44,7 +44,7 @@ func Success(w http.ResponseWriter, successResponse interface{}, responseCode ..
 	}
 
 	t := Template{
-		Status: true,
+		Status: http.StatusOK,
 		Result: successResponse,
 		Error:  nil,
 	}
@@ -72,7 +72,7 @@ func GenericError(r *http.Request, w http.ResponseWriter, err error, errorRespon
 	w.WriteHeader(responseCode)
 
 	t := Template{
-		Status: false,
+		Status: responseCode,
 		Result: nil,
 		Error:  errorResponse,
 	}

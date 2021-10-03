@@ -50,6 +50,9 @@ func (service userService) Register(ctx context.Context, namaLengkap, username, 
 
 func (service userService) Login(ctx context.Context, username, password, loginAs string) (*model.User, error) {
     user, err := service.r.FindByUsername(ctx, username, password, loginAs)
+    if err != nil {
+       return &model.User{}, err
+    }
 
     atClaims := contract.JWTMapClaim{
         Authorized: true,

@@ -24,6 +24,16 @@ type projectRepository struct {
 }
 
 func (repo projectRepository) Create(ctx context.Context, project *model.Project) (*model.Project, error) {
+    var invitedUserId []model.User
+    var collaboratorUserId []model.User
+
+    if len(project.InvitedUserId) > 0 {
+        repo.DB.Find(&invitedUserId, project.InvitedUserId)
+    }
+    if len(project.CollaboratorUserId) > 0 {
+        repo.DB.Find(&collaboratorUserId, project.CollaboratorUserId)
+    }
+
     p := &model.Project{
         KategoriProject:    project.KategoriProject,
         NamaProject:        project.NamaProject,
@@ -33,6 +43,8 @@ func (repo projectRepository) Create(ctx context.Context, project *model.Project
         InvitedUserId:      project.InvitedUserId,
         CollaboratorUserId: project.CollaboratorUserId,
         Admin:              project.Admin,
+        UsersInvited:       invitedUserId,
+        UsersCollaborator:  collaboratorUserId,
     }
 
     result := repo.DB.Create(&p)
