@@ -18,7 +18,7 @@ type User struct {
 	Password string `gorm:"->;<-;not null" json:"-" form:"password"`
 	Token    string `gorm:"-" json:"token,omitempty"`
 	RoleID   uint   `gorm:"->;<-;not null" json:"-"`
-	Role     Role   `gorm:"foreignKey:RoleID;constraint:onUpdate:CASCADE,onDelete:CASCADE" json:"role,omitempty"`
+	Role     Role   `gorm:"-" json:"role"`
 }
 
 // func (user *User) SetPassword(password string) string {

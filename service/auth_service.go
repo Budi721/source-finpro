@@ -1,81 +1,39 @@
 package service
 
 import (
-	"fmt"
-	"strconv"
-
-	"github.com/dgrijalva/jwt-go"
-	"github.com/google/uuid"
-	"github.com/itp-backend/backend-a-co-create/common/errors"
-	"github.com/itp-backend/backend-a-co-create/config"
-	"github.com/itp-backend/backend-a-co-create/contract"
-	"github.com/itp-backend/backend-a-co-create/external/jwt_client"
-	log "github.com/sirupsen/logrus"
+	"github.com/itp-backend/backend-a-co-create/dto"
+	"github.com/itp-backend/backend-a-co-create/helper/bc"
+	"github.com/itp-backend/backend-a-co-create/model"
+	"github.com/itp-backend/backend-a-co-create/repository"
 )
 
-type authService struct {
-	appConfig *config.Config
-	jwtClient jwt_client.JWTClientInterface
+type AuthService interface {
+	VerifyCredential(email, password string) interface{}
+	CreateUser(user dto.RegisterDTO) model.User
+	IsDuplicateEmail(email string) bool
 }
 
-type AuthServiceInterface interface {
-	GetToken() (*contract.GetTokenResponseContract, error)
-	VerifyToken(req *contract.ValidateTokenRequestContract) (*contract.JWTMapClaim, error)
+func VerifyCredential(email, password string) interface{} {
+	res := repository.VerifyCredential(email, password)
+	if val, ok := res.(model.User); ok {
+		comparePass := bc.ComparePass(val.Password, password)
+		if val.Email == email && comparePass {
+			return res
+		}
+		return false
+	}
+	return false
 }
 
-func NewAuthService(appConfig *config.Config, jwtClient jwt_client.JWTClientInterface) *authService {
-	return &authService{
-		appConfig: appConfig,
-		jwtClient: jwtClient,
+func CreateUser(user dto.RegisterDTO) model.User {
+	userToCreate := model.User{
+		Name:     user.Name,
+		Email:    user.Email,
+		Password: user.Password,
+		RoleID:   uint(user.RoleID),
 	}
 }
 
-func (s *authService) GetToken() (*contract.GetTokenResponseContract, error) {
-	atClaims := contract.JWTMapClaim{
-		Authorized: true,
-		RequestID:  uuid.New().String(),
-	}
+func IsDuplicateEmail(email string) bool {
 
-	token, err := s.jwtClient.GenerateTokenStringWithClaims(atClaims, s.appConfig.JWTSecret)
-
-	if err != nil {
-		errMsg := fmt.Sprintf("error signed JWT credentials: %v", err)
-		log.Errorf(errMsg)
-		return nil, errors.NewInternalError(err, errMsg)
-	}
-
-	return &contract.GetTokenResponseContract{Token: token}, err
-}
-
-func (s *authService) VerifyToken(req *contract.ValidateTokenRequestContract) (*contract.JWTMapClaim, error) {
-	claims := jwt.MapClaims{}
-
-	err := s.jwtClient.ParseTokenWithClaims(req.Token, claims, s.appConfig.JWTSecret)
-
-	if err != nil {
-		log.Errorln(err)
-		return nil, errors.NewUnauthorizedError("invalid parse token with claims")
-	}
-
-	authorized := fmt.Sprintf("%v", claims["authorized"])
-	requestID := fmt.Sprintf("%v", claims["requestID"])
-
-	if authorized == "" || requestID == "" {
-		return nil, errors.NewUnauthorizedError("invalid payload")
-	}
-
-	ok, err := strconv.ParseBool(authorized)
-
-	if err != nil || !ok {
-		log.Errorln(err)
-		return nil, errors.NewUnauthorizedError("invalid payload")
-	}
-
-	resp := &contract.JWTMapClaim{
-		Authorized:     claims["authorized"].(bool),
-		RequestID:      claims["requestID"].(string),
-		StandardClaims: jwt.StandardClaims{},
-	}
-
-	return resp, nil
 }

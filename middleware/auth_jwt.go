@@ -4,16 +4,18 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"testcocreate/helper/response"
-	"testcocreate/service"
+
+	"github.com/itp-backend/backend-a-co-create/helper/header"
+	"github.com/itp-backend/backend-a-co-create/helper/response"
+	"github.com/itp-backend/backend-a-co-create/service"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
+func AuthorizeJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+		authHeader := header.GetAuthorization(c)
 		if authHeader == "" {
 			response.BuildErrResponse(c, http.StatusNotFound, "Failed to process request", "No token found")
 			return
@@ -25,7 +27,9 @@ func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwtService.ValidateToken(authHeader)
+		stringToken := strings.Split(authHeader, " ")[1]
+
+		token, err := service.ValidateToken(stringToken)
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
 			log.Println("Claims[user_id]:", claims["user_id"])
@@ -35,5 +39,8 @@ func AuthorizeJWT(jwtService service.JWTService) gin.HandlerFunc {
 			response.BuildErrResponse(c, http.StatusUnauthorized, "Token is not valid", err.Error())
 			return
 		}
+
+		c.Set("userData", token.Claims.(jwt.MapClaims))
+		c.Next()
 	}
 }
