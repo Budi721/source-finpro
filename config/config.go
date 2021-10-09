@@ -1,57 +1,61 @@
 package config
 
 import (
-	log "github.com/sirupsen/logrus"
 	"os"
 
-	"github.com/subosito/gotenv"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	AppName        string
-	AppPort        int
-	LogLevel       string
-	Environment    string
-	JWTSecret      string
-	RedisAddress   string
-	DBUsername     string
-	DBPassword     string
-	DBHost         string
-	DBPort         int
-	DBName         string
-	MinioEndpoint  string
-	MinioAccessKey string
-	MinioSecretKey string
-	MinioRegion    string
-	MinioBucket    string
+	AppName         string
+	AppPort         string
+	LogLevel        string
+	Environment     string
+	EnvironmentLoc  string
+	EnvironmentProd string
+	EnvironmentRel  string
+	JWTSecret       string
+	RedisAddress    string
+	DBUsername      string
+	DBPassword      string
+	DBHost          string
+	DBPort          string
+	DBName          string
+	MinioEndpoint   string
+	MinioAccessKey  string
+	MinioSecretKey  string
+	MinioRegion     string
+	MinioBucket     string
 }
 
 func Init() *Config {
-	defaultEnv := ".env"
-
-	if err := gotenv.Load(defaultEnv); err != nil {
+	errEnv := godotenv.Load()
+	if errEnv != nil {
 		log.Warning("failed load .env")
 	}
 
-	log.SetOutput(os.Stdout)
-
 	appConfig := &Config{
-		AppName:        GetString("APP_NAME"),
-		AppPort:        GetInt("APP_PORT"),
-		LogLevel:       GetString("LOG_LEVEL"),
-		Environment:    GetString("ENVIRONMENT"),
-		JWTSecret:      GetString("JWT_SECRET"),
-		RedisAddress:   GetString("REDIS_ADDRESS"),
-		DBUsername:     GetString("DB_USERNAME"),
-		DBPassword:     GetString("DB_PASSWORD"),
-		DBHost:         GetString("DB_HOST"),
-		DBPort:         GetInt("DB_PORT"),
-		DBName:         GetString("DB_NAME"),
-		MinioEndpoint:  GetString("MINIO_ENDPOINT"),
-		MinioAccessKey: GetString("MINIO_ACCESS_KEY"),
-		MinioSecretKey: GetString("MINIO_SECRET_KEY"),
-		MinioRegion:    GetString("MINIO_REGION"),
-		MinioBucket:    GetString("MINIO_BUCKET"),
+		AppName:         os.Getenv("APP_NAME"),
+		AppPort:         os.Getenv("APP_PORT"),
+		LogLevel:        os.Getenv("LOG_LEVEL"),
+		Environment:     os.Getenv("ENVIRONMENT"),
+		EnvironmentLoc:  os.Getenv("ENVIRONMENT_LOC"),
+		EnvironmentProd: os.Getenv("ENVIRONMENT_PROD"),
+		EnvironmentRel:  os.Getenv("ENVIRONMENT_REL"),
+		JWTSecret:       os.Getenv("JWT_SECRET"),
+		RedisAddress:    os.Getenv("REDIS_ADDRESS"),
+		DBUsername:      os.Getenv("DB_USERNAME"),
+		DBPassword:      os.Getenv("DB_PASSWORD"),
+		DBHost:          os.Getenv("DB_HOST"),
+		DBPort:          os.Getenv("DB_PORT"),
+		DBName:          os.Getenv("DB_NAME"),
+		MinioEndpoint:   os.Getenv("MINIO_ENDPOINT"),
+		MinioAccessKey:  os.Getenv("MINIO_ACCESS_KEY"),
+		MinioSecretKey:  os.Getenv("MINIO_SECRET_KEY"),
+		MinioRegion:     os.Getenv("MINIO_REGION"),
+		MinioBucket:     os.Getenv("MINIO_BUCKET"),
 	}
 
 	return appConfig
