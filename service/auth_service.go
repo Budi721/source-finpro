@@ -32,8 +32,11 @@ func CreateUser(user dto.RegisterDTO) model.User {
 		Password: user.Password,
 		RoleID:   uint(user.RoleID),
 	}
+	res := repository.InsertUser(userToCreate)
+	return res
 }
 
 func IsDuplicateEmail(email string) bool {
-
+	err := repository.IsDuplicateEmail(email).Error
+	return err == nil
 }

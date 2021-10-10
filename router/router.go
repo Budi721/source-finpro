@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/config"
 	"github.com/itp-backend/backend-a-co-create/controller"
+	"github.com/itp-backend/backend-a-co-create/middleware"
 )
 
 func AllRouters() *gin.Engine {
@@ -17,9 +18,20 @@ func AllRouters() *gin.Engine {
 	{
 		authRouter := apiRoutes.Group("/auth")
 		{
-			authRouter.POST("/login", controller.TestRouter)
-			authRouter.POST("/register", controller.TestRouter)
+			authRouter.POST("/login", controller.Login)
+			authRouter.POST("/register", controller.Register)
 			authRouter.DELETE("/logout", controller.TestRouter)
+		}
+
+		adminRouter := apiRoutes.Group("/admin", middleware.AuthorizeJWT())
+		{
+			adminRouter.GET("/all-users", controller.TestRouter)
+		}
+
+		userRouter := apiRoutes.Group("/user", middleware.AuthorizeJWT())
+		{
+			userRouter.GET("/profile", controller.TestRouter)
+			userRouter.PUT("/update/", controller.TestRouter)
 		}
 
 		// with middleware jwt
