@@ -25,13 +25,14 @@ func AllRouters() *gin.Engine {
 
 		adminRouter := apiRoutes.Group("/admin", middleware.AuthorizeJWT())
 		{
-			adminRouter.GET("/all-users", controller.TestRouter)
+			adminRouter.GET("/all-users", controller.GetAllUser)
 		}
 
 		userRouter := apiRoutes.Group("/user", middleware.AuthorizeJWT())
 		{
 			userRouter.GET("/profile", controller.TestRouter)
-			userRouter.PUT("/update/", controller.TestRouter)
+			userRouter.PUT("/update", controller.UpdateUser)
+			userRouter.PUT("/change-password", controller.ChangePassword)
 		}
 
 		// with middleware jwt

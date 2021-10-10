@@ -22,23 +22,28 @@ func Login(c *gin.Context) {
 	var loginDTO dto.LoginDTO
 	contentType := header.GetContentType(c)
 
-	var errDTO error
+	var errBind error
 	if contentType == appJSON {
-		errDTO = c.ShouldBindJSON(&loginDTO)
+		errBind = c.ShouldBindJSON(&loginDTO)
 	} else {
-		errDTO = c.ShouldBind(&loginDTO)
+		errBind = c.ShouldBind(&loginDTO)
 	}
 
-	if errDTO != nil {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errDTO.Error())
+	if errBind != nil {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
 		return
 	}
 
 	authResult := service.VerifyCredential(loginDTO.Email, loginDTO.Password)
 	if val, ok := authResult.(model.User); ok {
 		generatedToken := service.GenerateToken(strconv.FormatUint(val.ID, 10))
-		val.Token = generatedToken
-		response.BuildResponse(c, http.StatusOK, "Login OK!", val)
+		res := dto.ResponseLogRegDTO{
+			ID:    val.ID,
+			Name:  val.Name,
+			Email: val.Email,
+			Token: generatedToken,
+		}
+		response.BuildResponse(c, http.StatusOK, "Login OK!", res)
 		return
 	}
 	response.BuildErrResponse(c, http.StatusUnauthorized, "Please check your credential", "Invalid credential")
@@ -48,15 +53,15 @@ func Register(c *gin.Context) {
 	var registerDTO dto.RegisterDTO
 	contentType := header.GetContentType(c)
 
-	var errDTO error
+	var errBind error
 	if contentType == appJSON {
-		errDTO = c.ShouldBindJSON(&registerDTO)
+		errBind = c.ShouldBindJSON(&registerDTO)
 	} else {
-		errDTO = c.ShouldBind(&registerDTO)
+		errBind = c.ShouldBind(&registerDTO)
 	}
 
-	if errDTO != nil {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errDTO.Error())
+	if errBind != nil {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
 		return
 	}
 
@@ -67,6 +72,11 @@ func Register(c *gin.Context) {
 
 	createdUser := service.CreateUser(registerDTO)
 	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.ID, 10))
-	createdUser.Token = generatedToken
-	response.BuildResponse(c, http.StatusCreated, "Register OK!", createdUser)
+	res := dto.ResponseLogRegDTO{
+		ID:    createdUser.ID,
+		Name:  createdUser.Name,
+		Email: createdUser.Email,
+		Token: generatedToken,
+	}
+	response.BuildResponse(c, http.StatusCreated, "Register OK!", res)
 }

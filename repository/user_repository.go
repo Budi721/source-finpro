@@ -9,12 +9,12 @@ import (
 
 type UserRepo interface {
 	InsertUser(user model.User) model.User
-	// UpdateUser(userID string) model.User
-	// ChangePassword(userID string) model.User
 	VerifyCredential(email, password string) interface{}
 	IsDuplicateEmail(email string) (tx *gorm.DB)
 	GetAllUser() []model.User
-	// Profile(userID string) model.User
+	UpdateUser(user model.User) model.User
+	ChangePassword(userID uint64, user model.User) model.User
+	Profile(userID uint64) model.User
 }
 
 var (
@@ -26,14 +26,6 @@ func InsertUser(user model.User) model.User {
 	db.Save(&user)
 	return user
 }
-
-// func UpdateUser(userID string) model.User {
-
-// }
-
-// func ChangePassword(userID string) model.User {
-
-// }
 
 func VerifyCredential(email, password string) interface{} {
 	var user model.User
@@ -55,6 +47,32 @@ func GetAllUser() []model.User {
 	return users
 }
 
-// func Profile(userID string) model.User {
+func UpdateUser(userID uint64, user model.User) model.User {
+	var tempUser model.User
+	db.First(&tempUser, userID)
+	user.ID = tempUser.ID
+	user.Password = tempUser.Password
+	user.RoleID = tempUser.RoleID
 
-// }
+	db.Save(&user)
+	return user
+}
+
+func ChangePassword(userID uint64, user model.User) model.User {
+	var tempUser model.User
+	db.First(&tempUser, userID)
+	user.ID = tempUser.ID
+	user.Name = tempUser.Name
+	user.Email = tempUser.Email
+	user.RoleID = tempUser.RoleID
+
+	user.Password = bc.HashAndSalt(user.Password)
+	db.Save(&user)
+	return user
+}
+
+func Profile(userID uint64) model.User {
+	var user model.User
+	db.First(&user, userID)
+	return user
+}
