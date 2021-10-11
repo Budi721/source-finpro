@@ -1,69 +1,86 @@
 package router
 
 import (
-    "fmt"
-    "net/http"
-	"os"
+	"log"
 
-	"github.com/itp-backend/backend-a-co-create/handler"
-	"github.com/itp-backend/backend-a-co-create/service"
-
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
+	"github.com/itp-backend/backend-a-co-create/config"
+	"github.com/itp-backend/backend-a-co-create/controller"
+	"github.com/itp-backend/backend-a-co-create/middleware"
 )
 
-func NewRouter(dependencies service.Dependencies) http.Handler {
-	r := mux.NewRouter()
+func AllRouters() *gin.Engine {
+	r := gin.Default()
 
-	setAuthRouter(r, dependencies.AuthService)
-	setCheckRouter(r, dependencies.CheckService)
-    setUserRouter(r, dependencies.UserService)
-    setEnrollmentRouter(r, dependencies.EnrollmentService)
-    setProjectRouter(r, dependencies.ProjectService)
-    setArticleRouter(r, dependencies.ArticleService)
+	r.GET("/", controller.TestRouter)
 
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
-	return loggedRouter
+	apiRoutes := r.Group("/api/v1")
+	{
+		authRouter := apiRoutes.Group("/auth")
+		{
+			authRouter.POST("/login", controller.Login)
+			authRouter.POST("/register", controller.Register)
+			authRouter.DELETE("/logout", controller.TestRouter)
+		}
+
+		adminRouter := apiRoutes.Group("/admin", middleware.AuthorizeJWT())
+		{
+			adminRouter.GET("/all-users", controller.GetAllUser)
+		}
+
+		userRouter := apiRoutes.Group("/user", middleware.AuthorizeJWT())
+		{
+			userRouter.GET("/myprofile", controller.MyProfile)
+			userRouter.PUT("/update", controller.UpdateUser)
+			userRouter.PUT("/change-password", controller.ChangePassword)
+		}
+
+		// with middleware jwt
+		enrollRouter := apiRoutes.Group("/enroll")
+		{
+			enrollRouter.GET("/requests", controller.TestRouter)
+			enrollRouter.POST("/approve", controller.TestRouter)
+		}
+
+		// with middleware jwt
+		acceptEnrollRouter := apiRoutes.Group("/accept-enroll")
+		{
+			acceptEnrollRouter.POST("/", controller.TestRouter)
+			acceptEnrollRouter.POST("/approve", controller.TestRouter)
+		}
+
+		// with middleware jwt
+		projectRouter := apiRoutes.Group("/project")
+		{
+			projectRouter.GET("/", controller.TestRouter)
+			projectRouter.POST("/create", controller.TestRouter)
+			projectRouter.GET("/detail/:id", controller.TestRouter)
+			projectRouter.DELETE("/delete/:id", controller.TestRouter)
+		}
+
+		articleRouter := apiRoutes.Group("/article")
+		{
+			articleRouter.GET("/list", controller.TestRouter)
+			articleRouter.POST("/create", controller.TestRouter)
+			articleRouter.GET("/detail/:id", controller.TestRouter)
+			articleRouter.DELETE("/delete/:id", controller.TestRouter)
+		}
+	}
+
+	return r
 }
 
-func setAuthRouter(router *mux.Router, dependencies service.AuthServiceInterface) {
-	router.Methods(http.MethodGet).Path("/auth/token").Handler(handler.GetToken(dependencies))
-	router.Methods(http.MethodPost).Path("/auth/token/validate").Handler(handler.ValidateToken(dependencies))
-}
+func RunRouter() {
+	port := config.Init().AppPort
+	if port == "" {
+		port = "8080"
+	}
 
-func setCheckRouter(router *mux.Router, checkService service.CheckService) {
-	router.Methods(http.MethodGet).Path("/check/redis").Handler(handler.CheckRedis(checkService))
-	router.Methods(http.MethodGet).Path("/check/mysql").Handler(handler.CheckMysql(checkService))
-	router.Methods(http.MethodGet).Path("/check/minio").Handler(handler.CheckMinio(checkService))
-}
+	mode := config.Init().Environment
+	gin.SetMode(mode)
+	r := AllRouters()
 
-func setUserRouter(router *mux.Router, dependencies service.IUserService) {
-    router.Methods(http.MethodPost).Path("/register").Handler(handler.Register(dependencies))
-    router.Methods(http.MethodPost).Path("/login").Handler(handler.Login(dependencies))
-    router.Methods(http.MethodPost).Path("/logout").Handler(handler.Logout())
-
-    // Testing Authentication
-    router.Methods(http.MethodGet).Path("/").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-        _, _ = fmt.Fprint(writer, "Hello Auth")
-    })
-}
-
-func setEnrollmentRouter(router *mux.Router, dependencies service.IEnrollmentService)  {
-    router.Methods(http.MethodGet).Path("/enrollment_requests").Queries("status", "{status}").Handler(handler.EnrollmentRequestHandler(dependencies))
-    // Kurang yang approve
-}
-
-func setProjectRouter(router *mux.Router, dependencies service.IProjectService) {
-    router.Methods(http.MethodPost).Path("/project/create").Handler(handler.CreateProjectHandler(dependencies))
-    router.Methods(http.MethodPost).Path("/project/detail/{id:[0-9]+}").Handler(handler.DetailProjectHandler(dependencies))
-    router.Methods(http.MethodPost).Path("/project/delete/{id:[0-9]+}").Handler(handler.DeleteProjectHandler(dependencies))
-    // Kurang yang approve
-    router.Methods(http.MethodPost).Path("/project").Queries("invited_user_id", "{invited_user_id}").Handler(handler.ProjectByInvitedUserIdHandler(dependencies))
-}
-
-func setArticleRouter(router *mux.Router, dependencies service.IArticleService) {
-    router.Methods(http.MethodPost).Path("/artikel/create").Handler(handler.CreateArticleHandler(dependencies))
-    router.Methods(http.MethodDelete).Path("/artikel/delete/{id:[0-9]+}").Handler(handler.DeleteArticleHandler(dependencies))
-    router.Methods(http.MethodGet).Path("/artikel/detail/{id:[0-9]+}").Handler(handler.GetArticleByIdHandler(dependencies))
-    router.Methods(http.MethodGet).Path("/list_artikel").Handler(handler.GetAllArticleHandler(dependencies))
+	log.Println("Starting server at", port)
+	log.Println("Quit the server with CTRL-C.")
+	log.Fatal(r.Run(":" + port))
 }
