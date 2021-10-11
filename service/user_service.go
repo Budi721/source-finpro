@@ -11,7 +11,7 @@ type UserService interface {
 	FindByID(userID uint64) model.User
 	UpdateUser(user dto.UserUpdateDTO) model.User
 	ChangePassword(userID uint64, user dto.ChangePasswordDTO) model.User
-	// FindByEmail(email string) model.User
+	FindByEmail(email string) model.User
 }
 
 func GetAllUser() []model.User {
@@ -41,6 +41,7 @@ func ChangePassword(userID uint64, user dto.ChangePasswordDTO) model.User {
 	return res
 }
 
-// func FindByEmail(email string) model.User {
-
-// }
+func FindByEmail(email string) model.User {
+	res := repository.FindByEmail(email)
+	return res
+}

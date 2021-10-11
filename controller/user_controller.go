@@ -9,7 +9,6 @@ import (
 	"github.com/itp-backend/backend-a-co-create/dto"
 	"github.com/itp-backend/backend-a-co-create/helper/header"
 	"github.com/itp-backend/backend-a-co-create/helper/response"
-	"github.com/itp-backend/backend-a-co-create/model"
 	"github.com/itp-backend/backend-a-co-create/service"
 )
 
@@ -17,24 +16,25 @@ type UserController interface {
 	GetAllUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	ChangePassword(c *gin.Context)
+	MyProfile(c *gin.Context)
 }
 
 func GetAllUser(c *gin.Context) {
-	var users []model.User
-	contentType := header.GetContentType(c)
+	// var users []model.User
+	// contentType := header.GetContentType(c)
 	userData := c.MustGet("userData").(jwt.MapClaims)
 
-	var errBind error
-	if contentType == appJSON {
-		errBind = c.ShouldBindJSON(&users)
-	} else {
-		errBind = c.ShouldBind(&users)
-	}
+	// var errBind error
+	// if contentType == appJSON {
+	// 	errBind = c.ShouldBindJSON(&users)
+	// } else {
+	// 	errBind = c.ShouldBind(&users)
+	// }
 
-	if errBind != nil {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
-		return
-	}
+	// if errBind != nil {
+	// 	response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
+	// 	return
+	// }
 
 	userID := userData["user_id"].(string)
 	id, err := strconv.ParseUint(userID, 10, 64)
@@ -112,4 +112,32 @@ func ChangePassword(c *gin.Context) {
 
 	userChangePass := service.ChangePassword(id, userPass)
 	response.BuildResponse(c, http.StatusCreated, "Change Password OK!", userChangePass)
+}
+
+func MyProfile(c *gin.Context) {
+	// var user model.User
+	// contentType := header.GetContentType(c)
+	userData := c.MustGet("userData").(jwt.MapClaims)
+
+	// var errBind error
+	// if contentType == appJSON {
+	// 	errBind = c.ShouldBindJSON(&user)
+	// } else {
+	// 	errBind = c.ShouldBind(&user)
+	// }
+
+	// if errBind != nil {
+	// 	response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
+	// 	return
+	// }
+
+	userID := userData["user_id"].(string)
+	id, err := strconv.ParseUint(userID, 10, 64)
+	if err != nil {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", "Parsing id not working")
+		return
+	}
+
+	getUser := service.FindByID(id)
+	response.BuildResponse(c, http.StatusOK, "Get Profile OK!", getUser)
 }

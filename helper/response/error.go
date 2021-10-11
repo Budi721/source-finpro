@@ -14,12 +14,19 @@ type ErrResponse struct {
 }
 
 func BuildErrResponse(c *gin.Context, sc int, message string, err string) {
-	splittedErr := strings.Split(err, "\n")
+	hasContains := strings.Contains(err, "\n")
+	var errString interface{}
+	if hasContains {
+		errString = strings.Split(err, "\n")
+	} else {
+		errString = err
+	}
+
 	res := ErrResponse{
 		Status:     false,
 		StatusCode: sc,
 		Message:    message,
-		Error:      splittedErr,
+		Error:      errString,
 	}
 
 	c.AbortWithStatusJSON(sc, res)

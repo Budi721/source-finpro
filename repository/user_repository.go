@@ -15,6 +15,7 @@ type UserRepo interface {
 	UpdateUser(user model.User) model.User
 	ChangePassword(userID uint64, user model.User) model.User
 	Profile(userID uint64) model.User
+	FindByEmail(email string) model.User
 }
 
 var (
@@ -74,5 +75,11 @@ func ChangePassword(userID uint64, user model.User) model.User {
 func Profile(userID uint64) model.User {
 	var user model.User
 	db.First(&user, userID)
+	return user
+}
+
+func FindByEmail(email string) model.User {
+	var user model.User
+	db.Where("email = ?", email).Take(&user)
 	return user
 }
