@@ -58,7 +58,7 @@ func AllRouters() *gin.Engine {
 			projectRouter.DELETE("/delete/:id", controller.TestRouter)
 		}
 
-		articleRouter := apiRoutes.Group("/artikel")
+		articleRouter := apiRoutes.Group("/article")
 		{
 			articleRouter.GET("/list", controller.TestRouter)
 			articleRouter.POST("/create", controller.TestRouter)
