@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"github.com/itp-backend/backend-a-co-create/config/database"
-	"github.com/itp-backend/backend-a-co-create/helper/bc"
-	"github.com/itp-backend/backend-a-co-create/model"
-	"gorm.io/gorm"
+    "github.com/itp-backend/backend-a-co-create/config/database"
+    "github.com/itp-backend/backend-a-co-create/helper/bc"
+    "github.com/itp-backend/backend-a-co-create/model"
+    "gorm.io/gorm"
 )
 
 type UserRepo interface {
@@ -22,10 +22,26 @@ var (
 	db *gorm.DB = database.SetupDBConn()
 )
 
-func InsertUser(user model.User) model.User {
+func InsertUser(user model.User, enrollment model.Enrollment) model.Enrollment {
+	tx := db.Begin()
+
 	user.Password = bc.HashAndSalt(user.Password)
-	db.Save(&user)
-	return user
+	result := tx.Create(&user)
+	if result.Error != nil {
+		tx.Rollback()
+		return model.Enrollment{}
+	}
+
+    enrollment.IdUser = user.ID
+    enrollment.Password = user.Password
+	result = tx.Create(&enrollment)
+	if result.Error != nil {
+		tx.Rollback()
+		return model.Enrollment{}
+    }
+
+    tx.Commit()
+	return enrollment
 }
 
 func VerifyCredential(email, password string) interface{} {

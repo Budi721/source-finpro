@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//SetupDBConnection
+// SetupDBConn SetupDBConnection
 func SetupDBConn() *gorm.DB {
 	dbuser := config.Init().DBUsername
 	dbpassword := config.Init().DBPassword
@@ -28,12 +28,12 @@ func SetupDBConn() *gorm.DB {
 	fmt.Println("Connect to database...")
 
 	// db migrate
-	db.AutoMigrate(&model.Role{}, &model.User{})
+	db.AutoMigrate(&model.Role{}, &model.User{}, &model.Enrollment{})
 
 	return db
 }
 
-//CloseDBConnection
+// CloseDBConn to close connection database
 func CloseDBConn(db *gorm.DB) {
 	dbSQL, err := db.DB()
 	if err != nil {
