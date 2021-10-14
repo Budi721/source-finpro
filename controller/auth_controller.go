@@ -20,8 +20,8 @@ type AuthController interface {
 
 func Login(c *gin.Context) {
 	var loginDTO dto.LoginDTO
-	contentType := header.GetContentType(c)
 
+	contentType := header.GetContentType(c)
 	var errBind error
 	if contentType == appJSON {
 		errBind = c.ShouldBindJSON(&loginDTO)
@@ -51,8 +51,8 @@ func Login(c *gin.Context) {
 
 func Register(c *gin.Context) {
 	var registerDTO dto.RegisterDTO
-	contentType := header.GetContentType(c)
 
+	contentType := header.GetContentType(c)
 	var errBind error
 	if contentType == appJSON {
 		errBind = c.ShouldBindJSON(&registerDTO)
