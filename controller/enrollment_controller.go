@@ -1,13 +1,11 @@
 package controller
 
 import (
-    "github.com/dgrijalva/jwt-go"
     "github.com/gin-gonic/gin"
-    "github.com/itp-backend/backend-a-co-create/helper/header"
+    "github.com/itp-backend/backend-a-co-create/helper/mc"
     "github.com/itp-backend/backend-a-co-create/helper/response"
     "github.com/itp-backend/backend-a-co-create/service"
     "net/http"
-    "strconv"
 )
 
 type EnrollmentController interface {
@@ -17,16 +15,14 @@ type EnrollmentController interface {
 
 func GetEnrollmentByStatus(c *gin.Context)  {
     status := c.Query("status")
-    userData := c.MustGet("userData").(jwt.MapClaims)
-    userID := userData["user_id"].(string)
-
-    id, err := strconv.ParseUint(userID, 10, 64)
-    if err != nil {
-        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", "Parsing id not working")
+    userid, errMC := mc.MapClaims(c)
+    if errMC != nil && userid == 0 {
+        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
         return
     }
+
     // validate authorization admin
-    getDataUser := service.FindByID(id)
+    getDataUser := service.FindByID(userid)
     if getDataUser.RoleID != 2 {
         response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
         return
@@ -47,31 +43,20 @@ func GetEnrollmentByStatus(c *gin.Context)  {
 
 func ApproveEnrollment(c *gin.Context)  {
     var idUserEnrollments map[string][]uint
-    userData := c.MustGet("userData").(jwt.MapClaims)
-    userID := userData["user_id"].(string)
-
-    id, err := strconv.ParseUint(userID, 10, 64)
-    if err != nil {
-        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", "Parsing id not working")
+    userid, errMC := mc.MapClaims(c)
+    if errMC != nil && userid == 0 {
+        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
         return
     }
     // validate authorization admin
-    getDataUser := service.FindByID(id)
+    getDataUser := service.FindByID(userid)
     if getDataUser.RoleID != 2 {
         response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
         return
     }
 
-    var errBind error
-    contentType := header.GetContentType(c)
-    if contentType == appJSON {
-        errBind = c.ShouldBindJSON(&idUserEnrollments)
-    } else {
-        errBind = c.ShouldBind(&idUserEnrollments)
-    }
-
-    if errBind != nil {
-        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
+    if err := c.ShouldBindJSON(&idUserEnrollments); err != nil {
+        response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", err.Error())
         return
     }
 

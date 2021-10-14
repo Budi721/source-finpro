@@ -35,7 +35,16 @@ func AllRouters() *gin.Engine {
 			userRouter.PUT("/change-password", controller.ChangePassword)
 		}
 
-		enrollRouter := apiRoutes.Group("/enrollment", middleware.AuthorizeJWT())
+		roleRouter := apiRoutes.Group("/role", middleware.AuthorizeJWT())
+		{
+			roleRouter.GET("/all-roles", controller.GetAllRoles)
+			roleRouter.POST("/create", controller.CreateRole)
+			roleRouter.GET("/myrole", controller.MyRole)
+			roleRouter.PUT("/update/:id", controller.TestRouter)
+			roleRouter.DELETE("/delete/:id", controller.DeleteRole)
+		}
+
+        enrollRouter := apiRoutes.Group("/enrollment", middleware.AuthorizeJWT())
 		{
 			enrollRouter.GET("/requests", controller.GetEnrollmentByStatus)
 			enrollRouter.POST("/approve", controller.ApproveEnrollment)

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/dto"
@@ -11,14 +12,15 @@ import (
 	"github.com/itp-backend/backend-a-co-create/service"
 )
 
-type UserController interface {
-	GetAllUser(c *gin.Context)
-	UpdateUser(c *gin.Context)
-	ChangePassword(c *gin.Context)
-	MyProfile(c *gin.Context)
+type RoleController interface {
+	GetAllRoles(c *gin.Context)
+	CreateRole(c *gin.Context)
+	MyRole(c *gin.Context)
+	UpdateRole(c *gin.Context)
+	DeleteRole(c *gin.Context)
 }
 
-func GetAllUser(c *gin.Context) {
+func GetAllRoles(c *gin.Context) {
 	userid, errMC := mc.MapClaims(c)
 	if errMC != nil && userid == 0 {
 		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
@@ -31,19 +33,19 @@ func GetAllUser(c *gin.Context) {
 		return
 	}
 
-	allUsers := service.GetAllUser()
-	response.BuildResponse(c, http.StatusOK, "All Data OK!", allUsers)
+	allRoles := service.GetAllRole()
+	response.BuildResponse(c, http.StatusOK, "All Data OK!", allRoles)
 }
 
-func UpdateUser(c *gin.Context) {
-	var user dto.UserUpdateDTO
+func CreateRole(c *gin.Context) {
+	var role dto.RoleDTO
 
 	contentType := header.GetContentType(c)
 	var errBind error
 	if contentType == appJSON {
-		errBind = c.ShouldBindJSON(&user)
+		errBind = c.ShouldBindJSON(&role)
 	} else {
-		errBind = c.ShouldBind(&user)
+		errBind = c.ShouldBind(&role)
 	}
 
 	if errBind != nil {
@@ -57,42 +59,17 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userUpdate := service.UpdateUser(userid, user)
-	response.BuildResponse(c, http.StatusCreated, "Update Data OK!", userUpdate)
+	getDataUser := service.FindByID(userid)
+	if getDataUser.RoleID != 1 {
+		response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
+		return
+	}
+
+	createdRole := service.CreateRole(role)
+	response.BuildResponse(c, http.StatusCreated, "Create Role OK!", createdRole)
 }
 
-func ChangePassword(c *gin.Context) {
-	var userPass dto.ChangePasswordDTO
-
-	contentType := header.GetContentType(c)
-	var errBind error
-	if contentType == appJSON {
-		errBind = c.ShouldBindJSON(&userPass)
-	} else {
-		errBind = c.ShouldBind(&userPass)
-	}
-
-	if errBind != nil {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
-		return
-	}
-
-	if userPass.Password != userPass.ConfirmPassword {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", "Password not matched")
-		return
-	}
-
-	userid, errMC := mc.MapClaims(c)
-	if errMC != nil && userid == 0 {
-		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
-		return
-	}
-
-	userChangePass := service.ChangePassword(userid, userPass)
-	response.BuildResponse(c, http.StatusCreated, "Change Password OK!", userChangePass)
-}
-
-func MyProfile(c *gin.Context) {
+func MyRole(c *gin.Context) {
 	userid, errMC := mc.MapClaims(c)
 	if errMC != nil && userid == 0 {
 		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
@@ -100,5 +77,31 @@ func MyProfile(c *gin.Context) {
 	}
 
 	getUser := service.FindByID(userid)
-	response.BuildResponse(c, http.StatusOK, "Get Profile OK!", getUser)
+	getRole := service.FindRoleID(uint64(getUser.RoleID))
+	response.BuildResponse(c, http.StatusOK, "Get Role OK!", getRole)
+}
+
+func DeleteRole(c *gin.Context) {
+	roleID := c.Param("id")
+
+	roleid, errPR := strconv.ParseUint(roleID, 10, 64)
+	if errPR != nil {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errPR.Error())
+		return
+	}
+
+	userid, errMC := mc.MapClaims(c)
+	if errMC != nil && userid == 0 {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
+		return
+	}
+
+	getDataUser := service.FindByID(userid)
+	if getDataUser.RoleID != 1 {
+		response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
+		return
+	}
+
+	roleDelete := service.DeleteRole(roleid)
+	response.BuildResponse(c, http.StatusAccepted, "Role has deleted", roleDelete)
 }
