@@ -71,12 +71,13 @@ func Register(c *gin.Context) {
 	}
 
 	createdUser := service.CreateUser(registerDTO)
-	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.ID, 10))
+	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.IdUser, 10))
 	res := dto.ResponseLogRegDTO{
-		ID:    createdUser.ID,
-		Name:  createdUser.Name,
-		Email: createdUser.Email,
-		Token: generatedToken,
+		ID:            createdUser.IdUser,
+		Name:          createdUser.NamaLengkap,
+		Email:         createdUser.Email,
+		Token:         generatedToken,
+		TopikDiminati: createdUser.TopikDiminati,
 	}
 	response.BuildResponse(c, http.StatusCreated, "Register OK!", res)
 }
