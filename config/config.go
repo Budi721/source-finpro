@@ -31,11 +31,6 @@ type Config struct {
 }
 
 func Init() *Config {
-	errEnv := godotenv.Load()
-	if errEnv != nil {
-		log.Warning("failed load .env")
-	}
-
 	appConfig := &Config{
 		AppName:         os.Getenv("APP_NAME"),
 		AppPort:         os.Getenv("APP_PORT"),
