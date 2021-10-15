@@ -25,14 +25,20 @@ func VerifyCredential(email, password string) interface{} {
 	return false
 }
 
-func CreateUser(user dto.RegisterDTO) model.User {
+func CreateUser(user dto.RegisterDTO) model.Enrollment {
+    enrollmentUser := model.Enrollment{
+        NamaLengkap:      user.Name,
+        Email:            user.Email,
+        TopikDiminati:    user.TopikDiminati,
+    }
+
 	userToCreate := model.User{
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
 		RoleID:   uint(user.RoleID),
 	}
-	res := repository.InsertUser(userToCreate)
+	res := repository.InsertUser(userToCreate, enrollmentUser)
 	return res
 }
 

@@ -20,8 +20,8 @@ type AuthController interface {
 
 func Login(c *gin.Context) {
 	var loginDTO dto.LoginDTO
-	contentType := header.GetContentType(c)
 
+	contentType := header.GetContentType(c)
 	var errBind error
 	if contentType == appJSON {
 		errBind = c.ShouldBindJSON(&loginDTO)
@@ -51,8 +51,8 @@ func Login(c *gin.Context) {
 
 func Register(c *gin.Context) {
 	var registerDTO dto.RegisterDTO
-	contentType := header.GetContentType(c)
 
+	contentType := header.GetContentType(c)
 	var errBind error
 	if contentType == appJSON {
 		errBind = c.ShouldBindJSON(&registerDTO)
@@ -71,12 +71,13 @@ func Register(c *gin.Context) {
 	}
 
 	createdUser := service.CreateUser(registerDTO)
-	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.ID, 10))
+	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.IdUser, 10))
 	res := dto.ResponseLogRegDTO{
-		ID:    createdUser.ID,
-		Name:  createdUser.Name,
-		Email: createdUser.Email,
-		Token: generatedToken,
+		ID:            createdUser.IdUser,
+		Name:          createdUser.NamaLengkap,
+		Email:         createdUser.Email,
+		Token:         generatedToken,
+		TopikDiminati: createdUser.TopikDiminati,
 	}
 	response.BuildResponse(c, http.StatusCreated, "Register OK!", res)
 }
