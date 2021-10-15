@@ -2,10 +2,6 @@ package config
 
 import (
 	"os"
-
-	log "github.com/sirupsen/logrus"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
