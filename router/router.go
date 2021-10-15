@@ -77,8 +77,12 @@ func RunRouter() {
 		port = "8080"
 	}
 
-	mode := config.Init().Environment
-	gin.SetMode(mode)
+	if mode := config.Init().Environment; mode == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(mode)
+	}
+
 	r := AllRouters()
 
 	log.Println("Starting server at", port)
