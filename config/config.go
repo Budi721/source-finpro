@@ -2,10 +2,6 @@ package config
 
 import (
 	"os"
-
-	log "github.com/sirupsen/logrus"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -31,13 +27,13 @@ type Config struct {
 }
 
 func Init() *Config {
-	checkEnv := os.Getenv("PRODUCTION")
-	if checkEnv != "production" {
-		errEnv := godotenv.Load()
-		if errEnv != nil {
-			log.Warning("failed load .env")
-		}
-	}
+	// checkEnv := os.Getenv("PRODUCTION")
+	// if checkEnv != "production" {
+	// 	errEnv := godotenv.Load()
+	// 	if errEnv != nil {
+	// 		log.Warning("failed load .env")
+	// 	}
+	// }
 
 	appConfig := &Config{
 		AppName:         os.Getenv("APP_NAME"),
