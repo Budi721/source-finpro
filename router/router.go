@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/config"
@@ -72,7 +73,7 @@ func AllRouters() *gin.Engine {
 }
 
 func RunRouter() {
-	port := config.Init().AppPort
+	port := os.Getenv("APP_PORT")
 	if port == "" {
 		port = "8080"
 	}
