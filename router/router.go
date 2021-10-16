@@ -73,9 +73,9 @@ func AllRouters() *gin.Engine {
 }
 
 func RunRouter() {
-	port := os.Getenv("APP_PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "80"
 	}
 
 	if mode := config.Init().Environment; mode == "production" {
