@@ -44,7 +44,7 @@ func AllRouters() *gin.Engine {
 			roleRouter.DELETE("/delete/:id", controller.DeleteRole)
 		}
 
-        enrollRouter := apiRoutes.Group("/enrollment", middleware.AuthorizeJWT())
+		enrollRouter := apiRoutes.Group("/enrollment", middleware.AuthorizeJWT())
 		{
 			enrollRouter.GET("/requests", controller.GetEnrollmentByStatus)
 			enrollRouter.POST("/approve", controller.ApproveEnrollment)
