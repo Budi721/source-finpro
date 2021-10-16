@@ -1,5 +1,7 @@
 module github.com/itp-backend/backend-a-co-create
 
+// +heroku goVersion go1.16
+
 go 1.14
 
 require (
