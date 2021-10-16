@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/dto"
@@ -52,6 +53,8 @@ func CreateRole(c *gin.Context) {
 		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errBind.Error())
 		return
 	}
+
+	role.Role = strings.ToLower(role.Role)
 
 	userid, errMC := mc.MapClaims(c)
 	if errMC != nil && userid == 0 {

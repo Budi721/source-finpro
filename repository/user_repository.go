@@ -1,10 +1,10 @@
 package repository
 
 import (
-    "github.com/itp-backend/backend-a-co-create/config/database"
-    "github.com/itp-backend/backend-a-co-create/helper/bc"
-    "github.com/itp-backend/backend-a-co-create/model"
-    "gorm.io/gorm"
+	"github.com/itp-backend/backend-a-co-create/config/database"
+	"github.com/itp-backend/backend-a-co-create/helper/bc"
+	"github.com/itp-backend/backend-a-co-create/model"
+	"gorm.io/gorm"
 )
 
 type UserRepo interface {
@@ -32,15 +32,15 @@ func InsertUser(user model.User, enrollment model.Enrollment) model.Enrollment {
 		return model.Enrollment{}
 	}
 
-    enrollment.IdUser = user.ID
-    enrollment.Password = user.Password
+	enrollment.IdUser = user.ID
+	enrollment.Password = user.Password
 	result = tx.Create(&enrollment)
 	if result.Error != nil {
 		tx.Rollback()
 		return model.Enrollment{}
-    }
+	}
 
-    tx.Commit()
+	tx.Commit()
 	return enrollment
 }
 
@@ -90,7 +90,10 @@ func ChangePassword(userID uint64, user model.User) model.User {
 
 func Profile(userID uint64) model.User {
 	var user model.User
+	var role model.Role
 	db.First(&user, userID)
+	db.First(&role, user.RoleID)
+	user.Role = role.Role
 	return user
 }
 
