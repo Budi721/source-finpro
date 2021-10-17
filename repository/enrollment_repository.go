@@ -5,7 +5,7 @@ import (
     log "github.com/sirupsen/logrus"
 )
 
-type nrollmentRepository interface {
+type EnrollmentRepository interface {
     FindAllByStatus(status string) ([]*model.Enrollment, error)
     UpdateStatusEnrollment(idUsers []uint) ([]*model.Enrollment, error)
 }

@@ -52,12 +52,14 @@ func AllRouters() *gin.Engine {
 		}
 
 		// with middleware jwt
-		projectRouter := apiRoutes.Group("/project")
+		projectRouter := apiRoutes.Group("/project", middleware.AuthorizeJWT())
 		{
-			projectRouter.GET("/", controller.TestRouter)
-			projectRouter.POST("/create", controller.TestRouter)
-			projectRouter.GET("/detail/:id", controller.TestRouter)
-			projectRouter.DELETE("/delete/:id", controller.TestRouter)
+			//projectRouter.GET("/", controller.TestRouter)
+			projectRouter.GET("/", controller.ProjectByInvitedUserId) // with param ?invited_user_id=2
+			projectRouter.POST("/create", controller.CreateProject)
+			projectRouter.GET("/detail/:id", controller.DetailProject)
+			projectRouter.DELETE("/delete/:id", controller.DeleteProject)
+			projectRouter.POST("/accept-invitation", controller.AcceptProject)
 		}
 
 		articleRouter := apiRoutes.Group("/article")
@@ -75,13 +77,11 @@ func AllRouters() *gin.Engine {
 func RunRouter() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "80"
+		port = "8080"
 	}
 
 	if mode := config.Init().Environment; mode == "production" {
 		gin.SetMode(gin.ReleaseMode)
-	} else {
-		gin.SetMode(mode)
 	}
 
 	r := AllRouters()
