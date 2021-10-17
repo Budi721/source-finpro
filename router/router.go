@@ -64,10 +64,10 @@ func AllRouters() *gin.Engine {
 
 		articleRouter := apiRoutes.Group("/article")
 		{
-			articleRouter.GET("/list", controller.TestRouter)
-			articleRouter.POST("/create", controller.TestRouter)
-			articleRouter.GET("/detail/:id", controller.TestRouter)
-			articleRouter.DELETE("/delete/:id", controller.TestRouter)
+			articleRouter.GET("/list", controller.GetAllArticle)
+			articleRouter.POST("/create", controller.CreateArticle)
+			articleRouter.GET("/detail/:id", controller.GetArticleById)
+			articleRouter.DELETE("/delete/:id", controller.DeleteArticle)
 		}
 	}
 
