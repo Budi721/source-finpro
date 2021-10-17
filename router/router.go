@@ -62,7 +62,7 @@ func AllRouters() *gin.Engine {
 			projectRouter.POST("/accept-invitation", controller.AcceptProject)
 		}
 
-		articleRouter := apiRoutes.Group("/article")
+		articleRouter := apiRoutes.Group("/article", middleware.AuthorizeJWT())
 		{
 			articleRouter.GET("/list", controller.GetAllArticle)
 			articleRouter.POST("/create", controller.CreateArticle)
