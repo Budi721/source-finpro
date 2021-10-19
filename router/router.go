@@ -2,7 +2,6 @@ package router
 
 import (
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/config"
@@ -41,6 +40,7 @@ func AllRouters() *gin.Engine {
 			roleRouter.GET("/all-roles", controller.GetAllRoles)
 			roleRouter.POST("/create", controller.CreateRole)
 			roleRouter.GET("/myrole", controller.MyRole)
+			roleRouter.GET("/check-role/:id", controller.CheckRole)
 			roleRouter.PUT("/update/:id", controller.TestRouter)
 			roleRouter.DELETE("/delete/:id", controller.DeleteRole)
 		}
@@ -62,12 +62,18 @@ func AllRouters() *gin.Engine {
 			projectRouter.POST("/accept-invitation", controller.AcceptProject)
 		}
 
-		articleRouter := apiRoutes.Group("/article", middleware.AuthorizeJWT())
+		articleRouter := apiRoutes.Group("/article")
 		{
 			articleRouter.GET("/list", controller.GetAllArticle)
+			articleRouter.Use(middleware.AuthorizeJWT())
 			articleRouter.POST("/create", controller.CreateArticle)
 			articleRouter.GET("/detail/:id", controller.GetArticleById)
 			articleRouter.DELETE("/delete/:id", controller.DeleteArticle)
+		}
+
+		injectRouter := apiRoutes.Group("/inject")
+		{
+			injectRouter.POST("/role/first", controller.InjectFirstRole)
 		}
 	}
 
@@ -75,7 +81,7 @@ func AllRouters() *gin.Engine {
 }
 
 func RunRouter() {
-	port := os.Getenv("PORT")
+	port := config.Init().AppPort
 	if port == "" {
 		port = "8080"
 	}
