@@ -23,11 +23,21 @@ func FindRoleID(roleID uint64) model.Role {
 	return res
 }
 
+func FindRoleForInject() model.Role {
+	res := repository.FindRoleForInject()
+	return res
+}
+
 func CreateRole(role dto.RoleDTO) model.Role {
 	roleToCreate := model.Role{
 		Role: role.Role,
 	}
 	res := repository.InsertRole(roleToCreate)
+	return res
+}
+
+func CreateRoles(roles []model.Role) []model.Role {
+	res := repository.InsertRoles(roles)
 	return res
 }
 
