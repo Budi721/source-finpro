@@ -20,9 +20,20 @@ func InsertRole(role model.Role) model.Role {
 	return role
 }
 
+func InsertRoles(roles []model.Role) []model.Role {
+	db.Create(&roles)
+	return roles
+}
+
 func FindRoleID(roleID uint64) model.Role {
 	var role model.Role
 	db.First(&role, roleID)
+	return role
+}
+
+func FindRoleForInject() model.Role {
+	var role model.Role
+	db.First(&role)
 	return role
 }
 
