@@ -84,6 +84,24 @@ func MyRole(c *gin.Context) {
 	response.BuildResponse(c, http.StatusOK, "Get Role OK!", getRole)
 }
 
+func CheckRole(c *gin.Context) {
+	roleID := c.Param("id")
+
+	roleid, errPR := strconv.ParseUint(roleID, 10, 64)
+	if errPR != nil {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errPR.Error())
+		return
+	}
+
+	getRole := service.FindRoleID(roleid)
+	if getRole.ID == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "Failed to process request", "Role not found")
+		return
+	}
+
+	response.BuildResponse(c, http.StatusOK, "Get Role By Id", getRole)
+}
+
 func DeleteRole(c *gin.Context) {
 	roleID := c.Param("id")
 

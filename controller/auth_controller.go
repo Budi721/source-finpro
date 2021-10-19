@@ -36,10 +36,18 @@ func Login(c *gin.Context) {
 
 	authResult := service.VerifyCredential(loginDTO.Email, loginDTO.Password)
 	if val, ok := authResult.(model.User); ok {
+		if val.RoleID != uint(loginDTO.LoginAs) {
+			response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "LoginAs not match. You're login not for this endpoint.")
+			return
+		}
+
+		role := service.FindRoleID(uint64(val.RoleID))
+
 		generatedToken := service.GenerateToken(strconv.FormatUint(val.ID, 10))
 		res := dto.ResponseLogRegDTO{
 			ID:    val.ID,
 			Name:  val.Name,
+			Role:  role.Role,
 			Email: val.Email,
 			Token: generatedToken,
 		}
@@ -70,12 +78,20 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	getRole := service.FindRoleID(registerDTO.RoleID)
+	if getRole.ID == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "Failed to process request", "Role not found")
+		return
+	}
+
 	createdUser := service.CreateUser(registerDTO)
+	role := service.FindRoleID(registerDTO.RoleID)
 	generatedToken := service.GenerateToken(strconv.FormatUint(createdUser.IdUser, 10))
 	res := dto.ResponseLogRegDTO{
 		ID:            createdUser.IdUser,
 		Name:          createdUser.NamaLengkap,
 		Email:         createdUser.Email,
+		Role:          role.Role,
 		Token:         generatedToken,
 		TopikDiminati: createdUser.TopikDiminati,
 	}
