@@ -28,7 +28,7 @@ func SetupDBConn() *gorm.DB {
 	fmt.Println("Connect to database...")
 
 	// db migrate
-	db.AutoMigrate(&model.Role{}, &model.User{}, &model.Enrollment{}, &model.Project{})
+	db.AutoMigrate(&model.Role{}, &model.User{}, &model.Enrollment{}, &model.Project{}, &model.Article{})
 
 	return db
 }

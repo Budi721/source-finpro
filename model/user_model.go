@@ -9,4 +9,6 @@ type User struct {
 	RoleID     uint       `gorm:"->;<-;not null" json:"-"`
 	Role       string     `gorm:"-" json:"role"`
 	Enrollment Enrollment `gorm:"foreignKey:IdUser" json:"-"`
+	Article    Article    `gorm:"foreignKey:IdUser" json:"-"`
+	Project    Project    `gorm:"foreignKey:Creator" json:"-"`
 }
