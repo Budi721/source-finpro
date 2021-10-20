@@ -11,6 +11,7 @@ import (
 
 func AllRouters() *gin.Engine {
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
 
 	r.GET("/", controller.TestRouter)
 
