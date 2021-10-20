@@ -75,6 +75,11 @@ func GetArticleById(c *gin.Context) {
 
 func GetAllArticle(c *gin.Context) {
 	articles, err := service.GetAllArticle()
+	if len(articles) == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "The server has not found anything matching the Request", "Not Found")
+		return
+	}
+
 	if err != nil {
 		log.Error(err)
 		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())

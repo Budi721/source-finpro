@@ -67,3 +67,14 @@ func UpdateInvitation(project dto.ProjectInvitation) (*model.Project, error) {
 
 	return projectUpdated, nil
 }
+
+
+func GetAllProject() ([]*model.Project, error) {
+	projects, err := repository.FindAllProject()
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return projects, nil
+}

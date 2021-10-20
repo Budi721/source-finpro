@@ -56,12 +56,12 @@ func AllRouters() *gin.Engine {
 		// with middleware jwt
 		projectRouter := apiRoutes.Group("/project", middleware.AuthorizeJWT())
 		{
-			//projectRouter.GET("/", controller.TestRouter)
 			projectRouter.GET("/", controller.ProjectByInvitedUserId) // with param ?invited_user_id=2
 			projectRouter.POST("/create", controller.CreateProject)
 			projectRouter.GET("/detail/:id", controller.DetailProject)
 			projectRouter.DELETE("/delete/:id", controller.DeleteProject)
 			projectRouter.POST("/accept-invitation", controller.AcceptProject)
+			projectRouter.GET("/list", controller.GetAllProject)
 		}
 
 		articleRouter := apiRoutes.Group("/article")

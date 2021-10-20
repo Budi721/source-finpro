@@ -143,3 +143,14 @@ func UpdateInvitationProject(project dto.ProjectInvitation) (*model.Project, err
 	}
 	return &projectUpdated, nil
 }
+
+
+func FindAllProject() ([]*model.Project, error) {
+	var projects []*model.Project
+	if err := db.Table("projects").Find(&projects).Error; err != nil {
+		log.Error(err)
+		return projects, err
+	}
+
+	return projects, nil
+}

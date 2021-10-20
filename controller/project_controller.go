@@ -130,3 +130,20 @@ func AcceptProject(c *gin.Context) {
 	response.BuildResponse(c, http.StatusOK, "Failed to process request", projectUpdated)
 	return
 }
+
+func GetAllProject(c *gin.Context) {
+	projects, err := service.GetAllProject()
+	if len(projects) == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "The server has not found anything matching the Request", "Not Found")
+		return
+	}
+	
+	if err != nil {
+		log.Error(err)
+		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
+		return
+	}
+	
+	response.BuildResponse(c, http.StatusOK, "Success", projects)
+	return
+}
