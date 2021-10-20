@@ -19,6 +19,11 @@ func GetAllUser() []model.User {
 	return res
 }
 
+func GetAllJustUser() []model.User {
+	res := repository.GetAllJustUser()
+	return res
+}
+
 func FindByID(userID uint64) model.User {
 	res := repository.Profile(userID)
 	return res

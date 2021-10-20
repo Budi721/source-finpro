@@ -32,6 +32,7 @@ func AllRouters() *gin.Engine {
 		userRouter := apiRoutes.Group("/user", middleware.AuthorizeJWT())
 		{
 			userRouter.GET("/myprofile", controller.MyProfile)
+			userRouter.POST("/all", controller.GetAllJustUser)
 			userRouter.PUT("/update", controller.UpdateUser)
 			userRouter.PUT("/change-password", controller.ChangePassword)
 		}

@@ -35,6 +35,22 @@ func GetAllUser(c *gin.Context) {
 	response.BuildResponse(c, http.StatusOK, "All Data OK!", allUsers)
 }
 
+func GetAllJustUser(c *gin.Context) {
+	userid, errMC := mc.MapClaims(c)
+	if errMC != nil && userid == 0 {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
+		return
+	}
+
+	role := service.FindRoleID(2)
+	justAllUser := service.GetAllJustUser()
+	for _, user := range justAllUser {
+		user.Role = role.Role
+	}
+
+	response.BuildResponse(c, http.StatusOK, "All just user OK!", justAllUser)
+}
+
 func UpdateUser(c *gin.Context) {
 	var user dto.UserUpdateDTO
 

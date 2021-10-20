@@ -64,6 +64,12 @@ func GetAllUser() []model.User {
 	return users
 }
 
+func GetAllJustUser() []model.User {
+	var users []model.User
+	db.Where("role_id = ?", 2).Find(&users)
+	return users
+}
+
 func UpdateUser(userID uint64, user model.User) model.User {
 	var tempUser model.User
 	db.First(&tempUser, userID)
