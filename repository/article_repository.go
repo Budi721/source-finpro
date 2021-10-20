@@ -76,4 +76,14 @@ func FindAllArticle() ([]*model.Article, error) {
 	return articles, nil
 }
 
+func FindArticleByIdUser(idUser uint64) (*model.Article, error) {
+	var article model.Article
+	article.IdUser = int(idUser)
 
+	if err := db.First(&article).Error; err != nil {
+		log.Error(err)
+		return &article, err
+	}
+
+	return &article, nil
+}

@@ -147,3 +147,20 @@ func GetAllProject(c *gin.Context) {
 	response.BuildResponse(c, http.StatusOK, "Success", projects)
 	return
 }
+func GetMyProject(c *gin.Context) {
+	id, errMC := mc.MapClaims(c)
+	if errMC != nil && id == 0 {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
+		return
+	}
+
+
+	project, err := service.GetProjectByCollaboratorUser(id)
+	if err != nil {
+		log.Error(err)
+		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
+		return
+	}
+
+	response.BuildResponse(c, http.StatusInternalServerError, "Failed to process request", project)
+}

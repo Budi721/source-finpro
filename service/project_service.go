@@ -13,6 +13,7 @@ type IProjectService interface {
 	DeleteProject(projectId int) error
 	GetProjectByInvitedUser(invitedId int) ([]*model.Project, error)
 	UpdateInvitation(project dto.ProjectInvitation) (*model.Project, error)
+	GetProjectByCollaboratorUser(collaboratorId uint64) ([]*model.Project, error)
 }
 
 type projectService struct {
@@ -68,7 +69,6 @@ func UpdateInvitation(project dto.ProjectInvitation) (*model.Project, error) {
 	return projectUpdated, nil
 }
 
-
 func GetAllProject() ([]*model.Project, error) {
 	projects, err := repository.FindAllProject()
 	if err != nil {
@@ -77,4 +77,13 @@ func GetAllProject() ([]*model.Project, error) {
 	}
 
 	return projects, nil
+}
+func GetProjectByCollaboratorUser(collaboratorId uint64) ([]*model.Project, error) {
+	project, err := repository.FindProjectByCollaboratorUserId(collaboratorId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return project, nil
 }

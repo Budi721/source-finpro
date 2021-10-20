@@ -61,6 +61,7 @@ func AllRouters() *gin.Engine {
 			projectRouter.GET("/detail/:id", controller.DetailProject)
 			projectRouter.DELETE("/delete/:id", controller.DeleteProject)
 			projectRouter.POST("/accept-invitation", controller.AcceptProject)
+			projectRouter.GET("/myproject", controller.GetMyProject)
 			projectRouter.GET("/list", controller.GetAllProject)
 		}
 
@@ -70,6 +71,7 @@ func AllRouters() *gin.Engine {
 			articleRouter.Use(middleware.AuthorizeJWT())
 			articleRouter.POST("/create", controller.CreateArticle)
 			articleRouter.GET("/detail/:id", controller.GetArticleById)
+			articleRouter.GET("/myarticle", controller.GetMyArticle)
 			articleRouter.DELETE("/delete/:id", controller.DeleteArticle)
 		}
 
