@@ -24,7 +24,7 @@ func GetEnrollmentByStatus(c *gin.Context) {
 
 	// validate authorization admin
 	getDataUser := service.FindByID(userid)
-	if getDataUser.RoleID != 2 {
+	if getDataUser.RoleID != 1 {
 		response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
 		return
 	}
@@ -51,7 +51,7 @@ func ApproveEnrollment(c *gin.Context) {
 	}
 	// validate authorization admin
 	getDataUser := service.FindByID(userid)
-	if getDataUser.RoleID != 2 {
+	if getDataUser.RoleID != 1 {
 		response.BuildErrResponse(c, http.StatusForbidden, "Failed to process request", "You're not admin")
 		return
 	}

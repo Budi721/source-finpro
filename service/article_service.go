@@ -12,6 +12,7 @@ type IArticleService interface {
 	DeleteArticle(idArticle int) error
 	GetArticleById(idArticle int) (*model.Article, error)
 	GetAllArticle() ([]*model.Article, error)
+	GetArticleByIdUser(idUser uint64) (*model.Article, error)
 }
 
 func CreateArticle(article *dto.Article) (*model.Article, error) {
@@ -49,4 +50,13 @@ func GetAllArticle() ([]*model.Article, error) {
 	}
 
 	return articles, nil
+}
+
+func GetArticleByIdUser(idUser uint64) (*model.Article, error) {
+	article, err := repository.FindArticleByIdUser(idUser)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return article, nil
 }

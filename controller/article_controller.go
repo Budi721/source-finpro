@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itp-backend/backend-a-co-create/dto"
 	"github.com/itp-backend/backend-a-co-create/helper/response"
+	"github.com/itp-backend/backend-a-co-create/helper/mc"
 	"github.com/itp-backend/backend-a-co-create/service"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -75,6 +76,11 @@ func GetArticleById(c *gin.Context) {
 
 func GetAllArticle(c *gin.Context) {
 	articles, err := service.GetAllArticle()
+	if len(articles) == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "The server has not found anything matching the Request", "Not Found")
+		return
+	}
+
 	if err != nil {
 		log.Error(err)
 		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
@@ -82,5 +88,24 @@ func GetAllArticle(c *gin.Context) {
 	}
 	
 	response.BuildResponse(c, http.StatusOK, "Success", articles)
+	return
+}
+
+func GetMyArticle(c *gin.Context) {
+	idUser, errMC := mc.MapClaims(c)
+	if errMC != nil && idUser == 0 {
+		response.BuildErrResponse(c, http.StatusBadRequest, "Failed to process request", errMC.Error())
+		return
+	}
+
+
+	article, err := service.GetArticleByIdUser(idUser)
+	if err != nil {
+		log.Error(err)
+		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
+		return
+	}
+
+	response.BuildResponse(c, http.StatusOK, "Success", article)
 	return
 }

@@ -13,6 +13,7 @@ type IProjectRepository interface {
 	FindProjectById(idProject int) (*model.Project, error)
 	DeleteProject(idProject int) error
 	FindProjectByInvitedUserId(invitedId int) ([]*model.Project, error)
+	FindProjectByCollaboratorUserId(collaboratorId uint64) ([]*model.Project, error)
 	UpdateInvitationProject(project dto.ProjectInvitation) (*model.Project, error)
 }
 
@@ -142,4 +143,36 @@ func UpdateInvitationProject(project dto.ProjectInvitation) (*model.Project, err
 		projectUpdated.InvitedUserId = append(projectUpdated.InvitedUserId, invited.ID)
 	}
 	return &projectUpdated, nil
+}
+
+func FindAllProject() ([]*model.Project, error) {
+	var projects []*model.Project
+	if err := db.Table("projects").Find(&projects).Error; err != nil {
+		log.Error(err)
+		return projects, err
+	}
+
+	return projects, nil
+}
+
+func FindProjectByCollaboratorUserId(collaboratorId uint64) ([]*model.Project, error) {
+	var projects []*model.Project
+	var user []model.User
+	db.Find(&user, collaboratorId)
+	if err := db.Where(&model.Project{UsersCollaborator: user}).Preload("UsersInvited").Preload("UsersCollaborator").Find(&projects).Error; err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	for _, project := range projects {
+		for _, collaborator := range project.UsersCollaborator {
+			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
+		}
+
+		for _, invited := range project.UsersInvited {
+			project.InvitedUserId = append(project.InvitedUserId, invited.ID)
+		}
+	}
+
+	return projects, nil
 }
