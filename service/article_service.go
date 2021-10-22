@@ -52,11 +52,11 @@ func GetAllArticle() ([]*model.Article, error) {
 	return articles, nil
 }
 
-func GetArticleByIdUser(idUser uint64) (*model.Article, error) {
-	article, err := repository.FindArticleByIdUser(idUser)
+func GetArticleByIdUser(idUser uint64) ([]*model.Article, error) {
+	articles, err := repository.FindArticleByIdUser(idUser)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	return article, nil
+	return articles, nil
 }

@@ -108,7 +108,7 @@ func ProjectByInvitedUserId(c *gin.Context) {
 		return
 	}
 
-	response.BuildResponse(c, http.StatusInternalServerError, "Failed to process request", project)
+	response.BuildResponse(c, http.StatusOK, "All Data OK!", project)
 }
 
 func AcceptProject(c *gin.Context) {
@@ -127,7 +127,7 @@ func AcceptProject(c *gin.Context) {
 		return
 	}
 
-	response.BuildResponse(c, http.StatusOK, "Failed to process request", projectUpdated)
+	response.BuildResponse(c, http.StatusOK, "Project Updated Success!", projectUpdated)
 	return
 }
 
@@ -162,5 +162,5 @@ func GetMyProject(c *gin.Context) {
 		return
 	}
 
-	response.BuildResponse(c, http.StatusInternalServerError, "Failed to process request", project)
+	response.BuildResponse(c, http.StatusOK, "All Data OK!", project)
 }
