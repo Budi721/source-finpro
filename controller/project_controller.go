@@ -102,6 +102,11 @@ func ProjectByInvitedUserId(c *gin.Context) {
 	}
 
 	project, err := service.GetProjectByInvitedUser(id)
+	if len(projects) == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "The server has not found anything matching the Request", "Not Found")
+		return
+	}
+	
 	if err != nil {
 		log.Error(err)
 		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
@@ -156,6 +161,11 @@ func GetMyProject(c *gin.Context) {
 
 
 	project, err := service.GetProjectByCollaboratorUser(id)
+	if len(projects) == 0 {
+		response.BuildErrResponse(c, http.StatusNotFound, "The server has not found anything matching the Request", "Not Found")
+		return
+	}
+
 	if err != nil {
 		log.Error(err)
 		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
