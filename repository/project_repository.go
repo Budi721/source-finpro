@@ -62,13 +62,21 @@ func FindProjectById(idProject int) (*model.Project, error) {
 		return nil, err
 	}
 
-	for _, collaborator := range project.UsersCollaborator {
-		project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
-	}
 
 	for _, invited := range project.UsersInvited {
+		var user *model.User
+		db.First(&user, invited.ID)
 		project.InvitedUserId = append(project.InvitedUserId, invited.ID)
+		project.InvitedUserName = append(project.InvitedUserName, user.Name)
 	}
+
+	for _, collaborator := range project.UsersCollaborator {
+		var user *model.User
+		db.First(&user, collaborator.ID)
+		project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
+		project.CollaboratorUserName = append(project.CollaboratorUserName, user.Name)
+	}
+
 	return &project, nil
 }
 
@@ -115,13 +123,21 @@ func FindProjectByInvitedUserId(invitedId int) ([]*model.Project, error) {
 	}
 
 	for _, project := range projects {
-		for _, collaborator := range project.UsersCollaborator {
-			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
-		}
 
 		for _, invited := range project.UsersInvited {
+			var user *model.User
+			db.First(&user, invited.ID)
 			project.InvitedUserId = append(project.InvitedUserId, invited.ID)
+			project.InvitedUserName = append(project.InvitedUserName, user.Name)
 		}
+
+		for _, collaborator := range project.UsersCollaborator {
+			var user *model.User
+			db.First(&user, collaborator.ID)
+			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
+			project.CollaboratorUserName = append(project.CollaboratorUserName, user.Name)
+		}
+
 	}
 
 	return projects, nil
@@ -146,12 +162,18 @@ func UpdateInvitationProject(project dto.ProjectInvitation) (*model.Project, err
 		return &model.Project{}, err
 	}
 
-	for _, collaborator := range projectUpdated.UsersCollaborator {
-		projectUpdated.CollaboratorUserId = append(projectUpdated.CollaboratorUserId, collaborator.ID)
+	for _, invited := range projectUpdated.UsersInvited {
+		var user *model.User
+		db.First(&user, invited.ID)
+		projectUpdated.InvitedUserId = append(projectUpdated.InvitedUserId, invited.ID)
+		projectUpdated.InvitedUserName = append(projectUpdated.InvitedUserName, user.Name)
 	}
 
-	for _, invited := range projectUpdated.UsersInvited {
-		projectUpdated.InvitedUserId = append(projectUpdated.InvitedUserId, invited.ID)
+	for _, collaborator := range projectUpdated.UsersCollaborator {
+		var user *model.User
+		db.First(&user, collaborator.ID)
+		projectUpdated.CollaboratorUserId = append(projectUpdated.CollaboratorUserId, collaborator.ID)
+		projectUpdated.CollaboratorUserName = append(projectUpdated.CollaboratorUserName, user.Name)
 	}
 	return &projectUpdated, nil
 }
@@ -178,15 +200,23 @@ func FindProjectByCollaboratorUserId(collaboratorId uint64) ([]*model.Project, e
 		log.Error(err)
 		return nil, err
 	}
-	
+
 	for _, project := range projects {
-		for _, collaborator := range project.UsersCollaborator {
-			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
+	
+		for _, invited := range project.UsersInvited {
+			var user *model.User
+			db.First(&user, invited.ID)
+			project.InvitedUserId = append(project.InvitedUserId, invited.ID)
+			project.InvitedUserName = append(project.InvitedUserName, user.Name)
 		}
 
-		for _, invited := range project.UsersInvited {
-			project.InvitedUserId = append(project.InvitedUserId, invited.ID)
+		for _, collaborator := range project.UsersCollaborator {
+			var user *model.User
+			db.First(&user, collaborator.ID)
+			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
+			project.CollaboratorUserName = append(project.CollaboratorUserName, user.Name)
 		}
+		
 	}
 
 	return projects, nil
