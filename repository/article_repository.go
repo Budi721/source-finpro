@@ -14,6 +14,7 @@ type IArticleRepository interface {
 	DeleteArticle(idArticle int) error
 	FindArticleById(idArticle int) (*model.Article, error)
 	FindAllArticle() ([]*model.Article, error)
+	FindArticleByIdUser(idUser uint64) ([]*model.Article, error)
 }
 
 type articleRepository struct {
@@ -76,14 +77,13 @@ func FindAllArticle() ([]*model.Article, error) {
 	return articles, nil
 }
 
-func FindArticleByIdUser(idUser uint64) (*model.Article, error) {
-	var article model.Article
-	article.IdUser = int(idUser)
+func FindArticleByIdUser(idUser uint64) ([]*model.Article, error) {
+	var articles []*model.Article
 
-	if err := db.First(&article).Error; err != nil {
+	if err := db.Where(&model.Article{IdUser: int(idUser)}).Find(&articles).Error; err != nil {
 		log.Error(err)
-		return &article, err
+		return articles, err
 	}
 
-	return &article, nil
+	return articles, nil
 }

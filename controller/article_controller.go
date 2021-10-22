@@ -99,13 +99,13 @@ func GetMyArticle(c *gin.Context) {
 	}
 
 
-	article, err := service.GetArticleByIdUser(idUser)
+	articles, err := service.GetArticleByIdUser(idUser)
 	if err != nil {
 		log.Error(err)
 		response.BuildErrResponse(c, http.StatusInternalServerError, "Failed to process request", err.Error())
 		return
 	}
 
-	response.BuildResponse(c, http.StatusOK, "Success", article)
+	response.BuildResponse(c, http.StatusOK, "Success", articles)
 	return
 }
