@@ -46,7 +46,9 @@ func InsertUser(user model.User, enrollment model.Enrollment) model.Enrollment {
 
 func VerifyCredential(email, password string) interface{} {
 	var user model.User
-	err := db.Joins("JOIN enrollments on enrollments.id_user=users.id").Where("email = ? AND enrollments.enrollment_status = ?", email, 1).Take(&user).Error
+	err := db.Joins("JOIN enrollments on enrollments.id_user=users.id").
+		Where("users.email = ? AND (enrollments.enrollment_status = ? OR users.role_id = ?)", email, 1, 1). 
+		Take(&user).Error
 	if err != nil {
 		return nil
 	}
