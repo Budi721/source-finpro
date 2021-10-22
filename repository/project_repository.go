@@ -23,10 +23,12 @@ type projectRepository struct {
 
 func CreateProject(project *dto.Project) (*model.Project, error) {
 	var invitedUserId []model.User
+	var collaboratorUserId []model.User
 
 	if len(project.InvitedUserId) > 0 {
 		db.Find(&invitedUserId, project.InvitedUserId)
 	}
+	db.Find(&collaboratorUserId, project.Creator)
 
 	projectToCreate := &model.Project{
 		KategoriProject:  project.KategoriProject,
@@ -35,14 +37,19 @@ func CreateProject(project *dto.Project) (*model.Project, error) {
 		LinkTrello:       project.LinkTrello,
 		DeskripsiProject: project.DeskripsiProject,
 		InvitedUserId:    project.InvitedUserId,
+		CollaboratorUserId: []uint64{project.Creator},
 		Creator:          project.Creator,
 		UsersInvited:     invitedUserId,
+		UsersCollaborator: collaboratorUserId,
 	}
+
 	result := db.Create(&projectToCreate)
+	
 	if result.Error != nil {
 		log.Error(result.Error)
 		return nil, result.Error
 	}
+
 	return projectToCreate, nil
 }
 
@@ -96,9 +103,13 @@ func DeleteProject(idProject int) error {
 
 func FindProjectByInvitedUserId(invitedId int) ([]*model.Project, error) {
 	var projects []*model.Project
-	var user []model.User
-	db.Find(&user, invitedId)
-	if err := db.Where(&model.Project{UsersInvited: user}).Preload("UsersInvited").Preload("UsersCollaborator").Find(&projects).Error; err != nil {
+
+	err := db.Joins("JOIN user_invited on user_invited.project_id_project=projects.id_project").
+			Where("user_invited.user_id = ?", invitedId).Preload("UsersInvited").Preload("UsersCollaborator").
+			Find(&projects).Error
+
+
+	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
@@ -157,13 +168,17 @@ func FindAllProject() ([]*model.Project, error) {
 
 func FindProjectByCollaboratorUserId(collaboratorId uint64) ([]*model.Project, error) {
 	var projects []*model.Project
-	var user []model.User
-	db.Find(&user, collaboratorId)
-	if err := db.Where(&model.Project{UsersCollaborator: user}).Preload("UsersInvited").Preload("UsersCollaborator").Find(&projects).Error; err != nil {
+
+	err := db.Joins("JOIN user_collaborator on user_collaborator.project_id_project=projects.id_project").
+			Where("user_collaborator.user_id = ?", collaboratorId).Preload("UsersInvited").Preload("UsersCollaborator").
+			Find(&projects).Error
+
+
+	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-
+	
 	for _, project := range projects {
 		for _, collaborator := range project.UsersCollaborator {
 			project.CollaboratorUserId = append(project.CollaboratorUserId, collaborator.ID)
