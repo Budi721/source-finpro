@@ -23,10 +23,12 @@ type projectRepository struct {
 
 func CreateProject(project *dto.Project) (*model.Project, error) {
 	var invitedUserId []model.User
+	var collaboratorUserId []model.User
 
 	if len(project.InvitedUserId) > 0 {
 		db.Find(&invitedUserId, project.InvitedUserId)
 	}
+	db.Find(&collaboratorUserId, project.Creator)
 
 	projectToCreate := &model.Project{
 		KategoriProject:  project.KategoriProject,
@@ -35,14 +37,19 @@ func CreateProject(project *dto.Project) (*model.Project, error) {
 		LinkTrello:       project.LinkTrello,
 		DeskripsiProject: project.DeskripsiProject,
 		InvitedUserId:    project.InvitedUserId,
+		CollaboratorUserId: []uint64{project.Creator},
 		Creator:          project.Creator,
 		UsersInvited:     invitedUserId,
+		UsersCollaborator: collaboratorUserId,
 	}
+
 	result := db.Create(&projectToCreate)
+	
 	if result.Error != nil {
 		log.Error(result.Error)
 		return nil, result.Error
 	}
+
 	return projectToCreate, nil
 }
 
