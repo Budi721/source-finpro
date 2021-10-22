@@ -10,5 +10,6 @@ type Project struct {
 	LinkTrello       string    `json:"link_trello" binding:"required"`
 	DeskripsiProject string    `json:"deskripsi_project" binding:"required"`
 	InvitedUserId    []uint64  `json:"invited_user_id" binding:"required"`
+	CollaboratorUserId []uint16 `json:"collaborator_user_id"`
 	Creator          uint64    `json:"creator"`
 }
